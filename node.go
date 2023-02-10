@@ -47,6 +47,7 @@ type Node struct {
 	Attr         []Attr
 
 	level int // node level in the tree
+	index int
 }
 
 type outputConfiguration struct {
@@ -78,6 +79,11 @@ func WithoutComments() OutputOption {
 	return func(oc *outputConfiguration) {
 		oc.skipComments = true
 	}
+}
+
+// Index returns the index of node.
+func (n *Node) Index() int {
+	return n.index
 }
 
 // InnerText returns the text between the start and end tags of the object.

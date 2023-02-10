@@ -80,7 +80,7 @@ func createParser(r io.Reader) *parser {
 
 func (p *parser) parse() (*Node, error) {
 	var streamElementNodeCounter int
-
+	globalIndex := 0
 	for {
 		tok, err := p.decoder.Token()
 		if err != nil {
@@ -99,7 +99,9 @@ func (p *parser) parse() (*Node, error) {
 					Data:  "xml",
 					Attr:  attributes,
 					level: 1,
+					index: globalIndex,
 				}
+				globalIndex += 1
 				AddChild(p.prev, node)
 				p.level = 1
 				p.prev = node
@@ -142,7 +144,9 @@ func (p *parser) parse() (*Node, error) {
 				NamespaceURI: tok.Name.Space,
 				Attr:         attributes,
 				level:        p.level,
+				index:        globalIndex,
 			}
+			globalIndex += 1
 
 			if p.level == p.prev.level {
 				AddSibling(p.prev, node)
@@ -237,7 +241,8 @@ func (p *parser) parse() (*Node, error) {
 			}
 			p.reader.StartCaching()
 		case xml.Comment:
-			node := &Node{Type: CommentNode, Data: string(tok), level: p.level}
+			node := &Node{Type: CommentNode, Data: string(tok), level: p.level, index: globalIndex}
+			globalIndex += 1
 			if p.level == p.prev.level {
 				AddSibling(p.prev, node)
 			} else if p.level > p.prev.level {
@@ -252,7 +257,8 @@ func (p *parser) parse() (*Node, error) {
 			if p.prev.Type != DeclarationNode {
 				p.level++
 			}
-			node := &Node{Type: DeclarationNode, Data: tok.Target, level: p.level}
+			node := &Node{Type: DeclarationNode, Data: tok.Target, level: p.level, index: globalIndex}
+			globalIndex += 1
 			pairs := strings.Split(string(tok.Inst), " ")
 			for _, pair := range pairs {
 				pair = strings.TrimSpace(pair)
