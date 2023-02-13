@@ -80,7 +80,7 @@ func createParser(r io.Reader) *parser {
 
 func (p *parser) parse() (*Node, error) {
 	var streamElementNodeCounter int
-	globalIndex := 0
+	var globalIndex float32 = 0.0
 	for {
 		tok, err := p.decoder.Token()
 		if err != nil {
