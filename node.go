@@ -83,7 +83,15 @@ func WithoutComments() OutputOption {
 
 // Index returns the index of node.
 func (n *Node) Index() int {
-	return n.index
+	switch n.Type {
+	case TextNode, CharDataNode, CommentNode, AttributeNode:
+		if n.PrevSibling != nil {
+			return n.PrevSibling.Index()
+		}
+		return n.Parent.Index()
+	default:
+		return n.index
+	}
 }
 
 // InnerText returns the text between the start and end tags of the object.
