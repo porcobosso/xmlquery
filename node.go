@@ -83,19 +83,30 @@ func WithoutComments() OutputOption {
 
 // Index returns the index of node.
 func (n *Node) Index() float32 {
-	return n.searchIndex(0)
-}
-
-func (n *Node) searchIndex(searchCount int) float32 {
 	switch n.Type {
-	case TextNode, CharDataNode, CommentNode, AttributeNode:
-		if n.PrevSibling != nil {
-			return n.PrevSibling.searchIndex(searchCount + 1)
+	case AttributeNode:
+		return n.Parent.index
+	case TextNode, CharDataNode, CommentNode:
+		if n.PrevSibling == nil {
+			return n.Parent.index
 		}
-		return n.Parent.searchIndex(1)
-	default:
-		return n.index + float32(searchCount)/1000.0
+		searchCount := 1
+		nn := n.PrevSibling
+		for {
+			switch nn.Type {
+			case TextNode, CharDataNode, CommentNode:
+				if nn.PrevSibling == nil {
+					nn = nn.PrevSibling
+					searchCount += 1
+					continue
+				}
+				return nn.Parent.index + float32(searchCount)/1000.0
+			default:
+				return nn.index + float32(searchCount)/1000.0
+			}
+		}
 	}
+	return n.index
 }
 
 // InnerText returns the text between the start and end tags of the object.
