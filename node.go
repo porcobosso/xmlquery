@@ -47,7 +47,7 @@ type Node struct {
 	Attr         []Attr
 
 	level int // node level in the tree
-	index int
+	index float32
 }
 
 type outputConfiguration struct {
@@ -82,15 +82,19 @@ func WithoutComments() OutputOption {
 }
 
 // Index returns the index of node.
-func (n *Node) Index() int {
+func (n *Node) Index() float32 {
+	return n.searchIndex(0)
+}
+
+func (n *Node) searchIndex(searchCount int) float32 {
 	switch n.Type {
 	case TextNode, CharDataNode, CommentNode, AttributeNode:
 		if n.PrevSibling != nil {
-			return n.PrevSibling.Index()
+			return n.PrevSibling.searchIndex(searchCount + 1)
 		}
-		return n.Parent.Index()
+		return n.Parent.searchIndex(1)
 	default:
-		return n.index
+		return n.index + float32(searchCount)/1000.0
 	}
 }
 
