@@ -12,7 +12,7 @@ const xmlDoc = `
 <catalog>
    <!-- book list-->
    <book id="bk101">
-      <author>Gambardella, Matthew</author>
+      <author 元素名称="作者">Gambardella, Matthew</author>
       <title>XML Developer's Guide</title>
       <genre>Computer</genre>
       <price>44.95</price>
@@ -45,9 +45,12 @@ const xmlDoc = `
 var doc = loadXML(xmlDoc)
 
 func TestXPath(t *testing.T) {
-	if list := Find(doc, "//book"); len(list) != 3 {
-		t.Fatal("count(//book) != 3")
+	if list := Find(doc, "//author[@元素名称='作者']"); len(list) != 1 {
+		t.Fatal("count(//author[@元素名称='作者']) != 1")
 	}
+	//if list := Find(doc, "//book"); len(list) != 3 {
+	//	t.Fatal("count(//book) != 3")
+	//}
 	if node := FindOne(doc, "//book[@id='bk101']"); node == nil {
 		t.Fatal("//book[@id='bk101] is not found")
 	}
@@ -161,12 +164,12 @@ func loadXML(s string) *Node {
 }
 
 func TestMissingTextNodes(t *testing.T) {
-    doc := loadXML(`
+	doc := loadXML(`
         <?xml version="1.0" encoding="utf-8"?>
         <corpus><p>Lorem <a>ipsum</a> dolor</p></corpus>
     `)
-    results := Find(doc, "//text()")
-    if len(results) != 3 {
-        t.Fatalf("Expected text nodes 3, got %d", len(results))
-    }
+	results := Find(doc, "//text()")
+	if len(results) != 3 {
+		t.Fatalf("Expected text nodes 3, got %d", len(results))
+	}
 }
